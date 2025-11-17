@@ -1,0 +1,171 @@
+﻿@page "/register"
+@using GamerTrade.Models.DTO
+@using System.ComponentModel.DataAnnotations
+@inject GamerTrade.Services.Interfaces.IAuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="register-page">
+    <div class="register-container">
+        <EditForm Model="@RegisterDTO" OnValidSubmit="@HandleRegister">
+            <DataAnnotationsValidator />
+
+            <div class="register-box">
+                <div class="register-header">
+                    <i class="bi bi-person-plus fs-1"></i>
+                    <h2>Crear Cuenta</h2>
+                    <p class="text-muted">Únete a la comunidad de GamerTrade</p>
+                </div>
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        @errorMessage
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(successMessage))
+                {
+                    <div class="alert alert-success" role="alert">
+                        <i class="bi bi-check-circle-fill"></i>
+                        @successMessage
+                    </div>
+                }
+
+                <div class="form-group mb-3">
+                    <label for="apodo">
+                        <i class="bi bi-person"></i> Apodo
+                    </label>
+                    <InputText id="apodo"
+                               @bind-Value="RegisterDTO.Apodo"
+                               placeholder="Tu nombre de usuario"
+                               class="form-control"
+                               disabled="@isLoading" />
+                    <ValidationMessage For="@(() => RegisterDTO.Apodo)" class="text-danger" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="email">
+                        <i class="bi bi-envelope"></i> Email
+                    </label>
+                    <InputText id="email"
+                               @bind-Value="RegisterDTO.Correo"
+                               placeholder="tu@email.com"
+                               class="form-control"
+                               disabled="@isLoading" />
+                    <ValidationMessage For="@(() => RegisterDTO.Correo)" class="text-danger" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="password">
+                        <i class="bi bi-lock"></i> Contraseña
+                    </label>
+                    <InputText id="password"
+                               type="password"
+                               @bind-Value="RegisterDTO.Password"
+                               placeholder="Mínimo 6 caracteres"
+                               class="form-control"
+                               disabled="@isLoading" />
+                    <ValidationMessage For="@(() => RegisterDTO.Password)" class="text-danger" />
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="confirmPassword">
+                        <i class="bi bi-lock-fill"></i> Confirmar Contraseña
+                    </label>
+                    <InputText id="confirmPassword"
+                               type="password"
+                               @bind-Value="RegisterDTO.ConfirmPassword"
+                               placeholder="Repite tu contraseña"
+                               class="form-control"
+                               disabled="@isLoading" />
+                    <ValidationMessage For="@(() => RegisterDTO.ConfirmPassword)" class="text-danger" />
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mb-3" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        <span>Registrando...</span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-check-circle me-2"></i>
+                        <span>Crear Cuenta</span>
+                    }
+                </button>
+
+                <div class="text-center">
+                    <p class="text-muted">
+                        ¿Ya tienes cuenta?
+                        <a href="/login" class="text-decoration-none fw-bold">Inicia sesión</a>
+                    </p>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private RegisterDTO RegisterDTO = new();
+    private string errorMessage = string.Empty;
+    private string successMessage = string.Empty;
+    private bool isLoading = false;
+
+    private async Task HandleRegister()
+    {
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+        isLoading = true;
+
+        try
+        {
+            // Validar que las contraseñas coincidan
+            if (RegisterDTO.Password != RegisterDTO.ConfirmPassword)
+            {
+                errorMessage = "Las contraseñas no coinciden";
+                isLoading = false;
+                return;
+            }
+
+            Console.WriteLine($" Registrando usuario: {RegisterDTO.Correo}");
+
+            var usuarioDTO = new CrearUsuarioDTO
+            {
+                Apodo = RegisterDTO.Apodo,
+                Correo = RegisterDTO.Correo,
+                Contraseña = RegisterDTO.Password,
+                RolID = 1, // Jugador
+                Saldo = 0
+            };
+
+            var success = await AuthService.RegistrarAsync(usuarioDTO);
+
+            if (success)
+            {
+                Console.WriteLine($" Usuario registrado exitosamente");
+                successMessage = "¡Cuenta creada exitosamente! Redirigiendo al login...";
+
+                await Task.Delay(2000); // Esperar 2 segundos
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                Console.WriteLine($" Error al registrar usuario");
+                errorMessage = "No se pudo crear la cuenta. El correo ya existe o hay un error en el servidor.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($" Excepción en HandleRegister: {ex.Message}");
+            errorMessage = "Ocurrió un error inesperado. Intenta de nuevo.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    
+}
+

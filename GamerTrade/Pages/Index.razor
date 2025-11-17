@@ -1,0 +1,31 @@
+﻿@page "/"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<div class="container">
+    <div>
+        <img src="img/logo.png" 
+        
+        
+    </div>
+
+    <div class="botones">
+        <button class="btn" @onclick="irATienda">Ir a la tienda</button>
+        <button class="btn" @onclick="irALogin">Iniciar sesión</button>
+    </div>
+</div>
+
+@code {
+    private void irATienda()
+    {
+        NavigationManager.NavigateTo("/tienda");
+    }
+
+    private void irALogin()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+
+    
+
+}

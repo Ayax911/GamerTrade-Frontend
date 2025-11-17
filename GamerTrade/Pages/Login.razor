@@ -1,0 +1,116 @@
+﻿@page "/login"
+@using GamerTrade.Models.DTO
+@inject GamerTrade.Services.Interfaces.IAuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="login-page">
+    <div class="login-container">
+        <EditForm Model="@loginRequest" OnValidSubmit="@HandleLogin">
+            <DataAnnotationsValidator />
+
+            <div class="login-box">
+                <div class="login-header">
+                    <i class="bi bi-controller fs-1"></i>
+                    <h2>Iniciar Sesión</h2>
+                    <p class="text-muted">Accede a tu cuenta de GamerTrade</p>
+                </div>
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        @errorMessage
+                    </div>
+                }
+
+                <div class="form-group mb-3">
+                    <label for="email">
+                        <i class="bi bi-envelope"></i> Email
+                    </label>
+                    <InputText id="email"
+                               @bind-Value="loginRequest.Correo"
+                               placeholder="tu@email.com"
+                               class="form-control"
+                               disabled="@isLoading" />
+                    <ValidationMessage For="@(() => loginRequest.Correo)" class="text-danger" />
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="password">
+                        <i class="bi bi-lock"></i> Contraseña
+                    </label>
+                    <InputText id="password"
+                               type="password"
+                               @bind-Value="loginRequest.Password"
+                               placeholder="Tu contraseña"
+                               class="form-control"
+                               disabled="@isLoading" />
+                    <ValidationMessage For="@(() => loginRequest.Password)" class="text-danger" />
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mb-3" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        <span>Iniciando sesión...</span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                        <span>Iniciar Sesión</span>
+                    }
+                </button>
+
+                <div class="text-center">
+                    <p class="mb-2">
+                        <a href="#" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+                    </p>
+                    <p class="text-muted">
+                        ¿No tienes cuenta?
+                        <a href="/register" class="text-decoration-none fw-bold">Regístrate aquí</a>
+                    </p>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private LoginRequest loginRequest = new();
+    private string errorMessage = string.Empty;
+    private bool isLoading = false;
+
+    private async Task HandleLogin()
+    {
+        errorMessage = string.Empty;
+        isLoading = true;
+
+        try
+        {
+            Console.WriteLine($"🔵 Intentando login con: {loginRequest.Correo}");
+
+            var (success, message) = await AuthService.LoginAsync(loginRequest);
+
+            if (success)
+            {
+                Console.WriteLine($" Login exitoso, redirigiendo...");
+                Navigation.NavigateTo("/tienda", forceLoad: true);
+            }
+            else
+            {
+                Console.WriteLine($" Login fallido: {message}");
+                errorMessage = message;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($" Excepción en HandleLogin: {ex.Message}");
+            errorMessage = "Ocurrió un error inesperado. Verifica tu conexión.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
+

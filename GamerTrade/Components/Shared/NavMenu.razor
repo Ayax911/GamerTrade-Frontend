@@ -1,0 +1,94 @@
+﻿@using GamerTrade.Services.Interfaces
+@inject ICarritoService CarritoService
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">GamerTrade</a>
+
+        <div class="d-flex align-items-center gap-3">
+            <!-- Badge del carrito -->
+            <button type="button" class="btn btn-outline-light position-relative" @onclick="AbrirCarrito">
+                <span class="bi bi-cart-fill"></span> Carrito
+                @if (ConteoItems > 0)
+                {
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        @ConteoItems
+                        <span class="visually-hidden">articulos en el carrito</span>
+                    </span>
+                }
+            </button>
+
+            <!-- Botón toggler -->
+            <button title="Navigation menu" class="navbar-toggler" @onclick="Toggle">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="@CssClass nav-scrollable">
+    <nav class="flex-column">
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/tienda">
+                <span class="bi bi-shop" aria-hidden="true"></span> Tienda
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <a class="nav-link" href="#" @onclick:preventDefault @onclick="AbrirCarrito">
+                <span class="bi bi-cart-fill" aria-hidden="true"></span> Ver Carrito
+            </a>
+        </div>
+
+    </nav>
+</div>
+
+<!-- Modal del Carrito -->
+<CarritoModal MostrarModal="@MostrarCarritoModal" 
+             OnCerrar="@CerrarCarrito"
+             UsuarioId="@UsuarioActualId" />
+
+@code {
+    private bool collapsed = true;
+    private bool MostrarCarritoModal = false;
+    private int ConteoItems = 0;
+    private int UsuarioActualId = 1; // Reemplazar con ID del usuario actual
+
+    private string CssClass => collapsed ? "collapse" : string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ActualizarConteoCarrito();
+    }
+
+    private void Toggle()
+    {
+        collapsed = !collapsed;
+    }
+
+    private async Task AbrirCarrito()
+    {
+        MostrarCarritoModal = true;
+        await ActualizarConteoCarrito();
+    }
+
+    private async Task CerrarCarrito()
+    {
+        MostrarCarritoModal = false;
+        await ActualizarConteoCarrito();
+    }
+
+    private async Task ActualizarConteoCarrito()
+    {
+        var carrito = await CarritoService.ObtenerCarritoAsync();
+        ConteoItems = carrito.Items.Count;
+        StateHasChanged();
+    }
+}

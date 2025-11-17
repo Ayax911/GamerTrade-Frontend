@@ -1,0 +1,12 @@
+﻿@using GamerTrade.Models.DTO
+
+<div class="product-grid">
+    @foreach (var p in Juegos)
+    {
+        <ProductCard Juego="p" />
+    }
+</div>
+
+@code {
+    [Parameter] public List<JuegoDTO> Juegos { get; set; } = new();
+}

@@ -1,0 +1,86 @@
+﻿@using GamerTrade.Models.DTO
+@using GamerTrade.Services.Interfaces
+@inject IJuegoService JuegoService
+
+<div class="filter-group">
+    <label class="form-label fw-bold">Categoría</label>
+    
+    @if (Cargando)
+    {
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Cargando categorías...</span>
+        </div>
+    }
+    else
+    {
+      @*  <select class="form-select" @bind="categoriaSeleccionada" @onchange="OnChange">
+            <option value="">Todas las categorías</option>
+            @foreach (var categoria in Categorias)
+            {
+                <option value="@categoria.CategoriaID">@categoria.Nombre</option>
+            }
+        </select>*@
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int SelectedCategoryId { get; set; }
+    
+    [Parameter]
+    public EventCallback<int> OnCategoryChanged { get; set; }
+    
+    private string categoriaSeleccionada = "";
+    private List<CategoriaDTO> Categorias = new();
+    private bool Cargando = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarCategorias();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (SelectedCategoryId > 0)
+        {
+            categoriaSeleccionada = SelectedCategoryId.ToString();
+        }
+        else
+        {
+            categoriaSeleccionada = "";
+        }
+    }
+
+    private async Task CargarCategorias()
+    {
+        try
+        {
+            Cargando = true;
+            Categorias = await JuegoService.ObtenerCategoriasAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar categorías: {ex.Message}");
+        }
+        finally
+        {
+            Cargando = false;
+        }
+    }
+
+    private async Task OnChange(ChangeEventArgs e)
+    {
+        string valor = e.Value?.ToString() ?? "";
+        
+        if (int.TryParse(valor, out int categoriaId))
+        {
+            categoriaSeleccionada = valor;
+            await OnCategoryChanged.InvokeAsync(categoriaId);
+        }
+        else
+        {
+            categoriaSeleccionada = "";
+            await OnCategoryChanged.InvokeAsync(0);
+        }
+    }
+}
