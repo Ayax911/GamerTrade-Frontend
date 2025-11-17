@@ -111,6 +111,7 @@ builder.Services.AddScoped<IApiService, ApiService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJuegoService, JuegoService>();
+builder.Services.AddScoped<ICarritoService, CarritoService>();
 
 
 
