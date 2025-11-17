@@ -4,11 +4,12 @@ namespace GamerTrade.Models.DTO
 {
     public class CarritoDTO
     {
-        public Guid CarritoID { get; set; }
-        public string CorreoUsuario { get; set; }
+        public Guid UniqueID { get; set; }
+        public string Correo_usuario { get; set; } = string.Empty;
         public List<ItemCarritoDTO> Items { get; set; } = new();
-        public decimal Total { get; set; }
+        public decimal Total => Items.Sum(i => i.Precio * i.Cantidad);
+        
     }
 
-    
+
 }

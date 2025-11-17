@@ -11,5 +11,14 @@ namespace GamerTrade.Services.Interfaces
         Task<List<JuegoDTO>> ObtenerPorCategoriaAsync(int categoriaId);
         Task<List<JuegoDTO>> OrdenarPorPrecioAsync(bool ascendente = true);
         Task<List<CategoriaDTO>> ObtenerCategoriasAsync();
+        /// <summary>
+        /// Obtiene el detalle completo de un juego (para página de detalle)
+        /// </summary>
+        Task<JuegoDetalleDTO?> ObtenerDetalleJuegoAsync(int juegoId);
+
+        /// <summary>
+        /// Obtiene las reseñas de un juego específico
+        /// </summary>
+        Task<List<ResenaDTO>> ObtenerResenasJuegoAsync(int juegoId);
     }
 }

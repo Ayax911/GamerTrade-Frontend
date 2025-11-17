@@ -7,5 +7,6 @@
         Task<bool> CrearAsync(string tabla, Dictionary<string, object?> datos, string? esquema = "dbo", string? camposEncriptar = null);
         Task<bool> ActualizarAsync(string tabla, string clave, string valor, Dictionary<string, object?> datos, string? esquema = "dbo", string? camposEncriptar = null);
         Task<bool> EliminarAsync(string tabla, string clave, string valor, string? esquema = "dbo");
+        Task<List<T>> EjecutarConsultaAsync<T>(string consulta, Dictionary<string, object>? parametros = null);
     }
 }

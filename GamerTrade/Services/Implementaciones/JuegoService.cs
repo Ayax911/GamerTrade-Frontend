@@ -131,5 +131,73 @@ namespace GamerTrade.Services.Implementaciones
                 return new List<CategoriaDTO>();
             }
         }
+
+        public async Task<JuegoDetalleDTO?> ObtenerDetalleJuegoAsync(int juegoId)
+        {
+            try
+            {
+                Console.WriteLine($"🎮 Obteniendo detalle del juego {juegoId}");
+
+                var consulta = "EXEC sp_ObtenerDetalleJuego @JuegoID";
+                var parametros = new Dictionary<string, object>
+                {
+                    { "@JuegoID", juegoId }
+                };
+
+                var resultado = await _apiService.EjecutarConsultaAsync<JuegoDetalleDTO>(
+                    consulta,
+                    parametros
+                );
+
+                if (resultado != null && resultado.Count > 0)
+                {
+                    var juego = resultado[0];
+
+                    // Cargar reseñas del juego
+                    juego.Resenas = await ObtenerResenasJuegoAsync(juegoId);
+
+                    Console.WriteLine($"✅ Detalle obtenido: {juego.Titulo}");
+                    return juego;
+                }
+
+                Console.WriteLine($"⚠️ No se encontró el juego {juegoId}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error en ObtenerDetalleJuegoAsync: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Obtiene las reseñas de un juego usando stored procedure
+        /// </summary>
+        public async Task<List<ResenaDTO>> ObtenerResenasJuegoAsync(int juegoId)
+        {
+            try
+            {
+                Console.WriteLine($"💬 Obteniendo reseñas del juego {juegoId}");
+
+                var consulta = "EXEC sp_ObtenerResenasJuego @JuegoID";
+                var parametros = new Dictionary<string, object>
+                {
+                    { "@JuegoID", juegoId }
+                };
+
+                var resultado = await _apiService.EjecutarConsultaAsync<ResenaDTO>(
+                    consulta,
+                    parametros
+                );
+
+                Console.WriteLine($"✅ {resultado?.Count ?? 0} reseñas obtenidas");
+                return resultado ?? new List<ResenaDTO>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error en ObtenerResenasJuegoAsync: {ex.Message}");
+                return new List<ResenaDTO>();
+            }
+        }
     }
 }

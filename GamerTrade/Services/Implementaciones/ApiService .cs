@@ -203,5 +203,68 @@ namespace GamerTrade.Services
                 return false;
             }
         }
+
+        public async Task<List<T>> EjecutarConsultaAsync<T>(string consulta, Dictionary<string, object>? parametros = null)
+        {
+            try
+            {
+                var url = "api/Consultas/EjecutarConsulta";
+
+                // Preparar el cuerpo de la solicitud
+                var body = new Dictionary<string, object>
+                {
+                    { "consulta", consulta }
+                };
+
+                if (parametros != null && parametros.Count > 0)
+                {
+                    body["parametros"] = parametros;
+                }
+
+                Console.WriteLine($"🔵 POST: {url}");
+                Console.WriteLine($"📤 Consulta: {consulta}");
+                if (parametros != null)
+                    Console.WriteLine($"📤 Parámetros: {JsonSerializer.Serialize(parametros)}");
+
+                var response = await _http.PostAsJsonAsync(url, body, _jsonOptions);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"❌ Error en consulta: {response.StatusCode} - {error}");
+                    return new List<T>();
+                }
+
+                // La API devuelve { "Registros": [...], "Cantidad": X }
+                var resultado = await response.Content.ReadFromJsonAsync<ConsultaResponse<T>>(_jsonOptions);
+
+                if (resultado?.Registros != null)
+                {
+                    Console.WriteLine($"✅ Consulta ejecutada: {resultado.Registros.Count} registros");
+                    return resultado.Registros;
+                }
+
+                Console.WriteLine($"⚠️ Consulta sin resultados");
+                return new List<T>();
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"❌ Error HTTP en EjecutarConsultaAsync: {ex.Message}");
+                return new List<T>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error en EjecutarConsultaAsync: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return new List<T>();
+            }
+        }
+
+        // Clase auxiliar para deserializar la respuesta de la API
+        private class ConsultaResponse<T>
+        {
+            public List<T> Registros { get; set; } = new();
+            public int Cantidad { get; set; }
+        }
     }
 }

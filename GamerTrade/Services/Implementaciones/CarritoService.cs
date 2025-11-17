@@ -1,144 +1,254 @@
-﻿namespace GamerTrade.Services.Implementaciones
-{
-    using GamerTrade.Models.DTO;
-    using GamerTrade.Services.Interfaces;
-    using System.Net.Http.Json;
+﻿using GamerTrade.Models.DTO;
+using GamerTrade.Services.Interfaces;
 
+namespace GamerTrade.Services.Implementaciones
+{
+    /// <summary>
+    /// Servicio para la gestión del carrito de compras
+    /// Usa stored procedures a través del ApiService
+    /// </summary>
     public class CarritoService : ICarritoService
     {
-        private readonly HttpClient _httpClient;
-        private CarritoDTO _carritoEnCache = new();
+        private readonly IApiService _apiService;
 
-        public event Action OnCarritoActualizado;
-
-        public CarritoService(HttpClient httpClient)
+        public CarritoService(IApiService apiService)
         {
-            _httpClient = httpClient;
+            _apiService = apiService;
         }
 
-        public async Task<CarritoDTO> ObtenerCarritoAsync()
+        /// <summary>
+        /// Agrega un juego al carrito del usuario
+        /// </summary>
+        public async Task<RespuestaCarritoDTO> AgregarAlCarritoAsync(int juegoId, string correoUsuario)
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/carrito");
+                Console.WriteLine($"🛒 Agregando juego {juegoId} al carrito de {correoUsuario}");
 
-                if (response.IsSuccessStatusCode)
+                var consulta = "EXEC sp_AgregarItemCarrito @CorreoUsuario, @JuegoID";
+                var parametros = new Dictionary<string, object>
                 {
-                    _carritoEnCache = await response.Content.ReadFromJsonAsync<CarritoDTO>() ?? new CarritoDTO();
-                    return _carritoEnCache;
+                    { "@CorreoUsuario", correoUsuario },
+                    { "@JuegoID", juegoId }
+                };
+
+                var resultado = await _apiService.EjecutarConsultaAsync<RespuestaCarritoDTO>(
+                    consulta,
+                    parametros
+                );
+
+                if (resultado != null && resultado.Count > 0)
+                {
+                    Console.WriteLine($"✅ Respuesta: {resultado[0].Mensaje}");
+                    return resultado[0];
                 }
 
-                return _carritoEnCache;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Error obteniendo carrito: {ex.Message}");
-                return _carritoEnCache;
-            }
-        }
-
-        public async Task<ResultadoCarritoDTO> AgregarItemAsync(int juegoId)
-        {
-            try
-            {
-                var response = await _httpClient.PostAsync($"api/carrito/agregar/{juegoId}", null);
-
-                if (response.IsSuccessStatusCode)
+                return new RespuestaCarritoDTO
                 {
-                    var resultado = await response.Content.ReadFromJsonAsync<ResultadoCarritoDTO>();
-                    await ObtenerCarritoAsync(); // Sincronizar caché
-                    NotificarActualizacion();
-                    return resultado;
-                }
-
-                return new ResultadoCarritoDTO
-                {
-                    Resultado = 0,
-                    Mensaje = $"Error: {response.StatusCode}"
+                    Mensaje = "Error al agregar el juego al carrito",
+                    Exito = 0
                 };
             }
             catch (Exception ex)
             {
-                return new ResultadoCarritoDTO
+                Console.WriteLine($"❌ Error en AgregarAlCarritoAsync: {ex.Message}");
+                return new RespuestaCarritoDTO
                 {
-                    Resultado = 0,
-                    Mensaje = ex.Message
+                    Mensaje = $"Error: {ex.Message}",
+                    Exito = 0
                 };
             }
         }
 
-        public async Task<ResultadoCarritoDTO> EliminarItemAsync(int juegoId)
+        /// <summary>
+        /// Obtiene todos los items del carrito del usuario
+        /// </summary>
+        public async Task<List<ItemCarritoDTO>> ObtenerItemsCarritoAsync(string correoUsuario)
         {
             try
             {
-                var response = await _httpClient.DeleteAsync($"api/carrito/eliminar/{juegoId}");
+                Console.WriteLine($"📦 Obteniendo items del carrito de {correoUsuario}");
 
-                if (response.IsSuccessStatusCode)
+                var consulta = "EXEC sp_ObtenerItemsCarrito @CorreoUsuario";
+                var parametros = new Dictionary<string, object>
                 {
-                    var resultado = await response.Content.ReadFromJsonAsync<ResultadoCarritoDTO>();
-                    await ObtenerCarritoAsync();
-                    NotificarActualizacion();
-                    return resultado;
+                    { "@CorreoUsuario", correoUsuario }
+                };
+
+                var resultado = await _apiService.EjecutarConsultaAsync<ItemCarritoDTO>(
+                    consulta,
+                    parametros
+                );
+
+                Console.WriteLine($"✅ {resultado?.Count ?? 0} items en el carrito");
+                return resultado ?? new List<ItemCarritoDTO>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error en ObtenerItemsCarritoAsync: {ex.Message}");
+                return new List<ItemCarritoDTO>();
+            }
+        }
+
+        /// <summary>
+        /// Elimina un juego del carrito
+        /// </summary>
+        public async Task<RespuestaCarritoDTO> EliminarDelCarritoAsync(int juegoId, string correoUsuario)
+        {
+            try
+            {
+                Console.WriteLine($"🗑️ Eliminando juego {juegoId} del carrito de {correoUsuario}");
+
+                var consulta = "EXEC sp_EliminarItemCarrito @CorreoUsuario, @JuegoID";
+                var parametros = new Dictionary<string, object>
+                {
+                    { "@CorreoUsuario", correoUsuario },
+                    { "@JuegoID", juegoId }
+                };
+
+                var resultado = await _apiService.EjecutarConsultaAsync<RespuestaCarritoDTO>(
+                    consulta,
+                    parametros
+                );
+
+                if (resultado != null && resultado.Count > 0)
+                {
+                    Console.WriteLine($"✅ Respuesta: {resultado[0].Mensaje}");
+                    return resultado[0];
                 }
 
-                return new ResultadoCarritoDTO
+                return new RespuestaCarritoDTO
                 {
-                    Resultado = 0,
-                    Mensaje = "Error eliminando item"
+                    Mensaje = "Error al eliminar el juego del carrito",
+                    Exito = 0
                 };
             }
             catch (Exception ex)
             {
-                return new ResultadoCarritoDTO
+                Console.WriteLine($"❌ Error en EliminarDelCarritoAsync: {ex.Message}");
+                return new RespuestaCarritoDTO
                 {
-                    Resultado = 0,
-                    Mensaje = ex.Message
+                    Mensaje = $"Error: {ex.Message}",
+                    Exito = 0
                 };
             }
         }
 
-        public async Task<ResultadoCarritoDTO> VaciarCarritoAsync()
+        /// <summary>
+        /// Vacía completamente el carrito del usuario
+        /// </summary>
+        public async Task<RespuestaCarritoDTO> VaciarCarritoAsync(string correoUsuario)
         {
             try
             {
-                var response = await _httpClient.DeleteAsync("api/carrito/vaciar");
+                Console.WriteLine($"🧹 Vaciando carrito de {correoUsuario}");
 
-                if (response.IsSuccessStatusCode)
+                var consulta = "EXEC sp_VaciarCarrito @CorreoUsuario";
+                var parametros = new Dictionary<string, object>
                 {
-                    _carritoEnCache = new CarritoDTO { Items = new() };
-                    NotificarActualizacion();
-                    return new ResultadoCarritoDTO
-                    {
-                        Resultado = 1,
-                        Mensaje = "Carrito vaciado"
-                    };
+                    { "@CorreoUsuario", correoUsuario }
+                };
+
+                var resultado = await _apiService.EjecutarConsultaAsync<RespuestaCarritoDTO>(
+                    consulta,
+                    parametros
+                );
+
+                if (resultado != null && resultado.Count > 0)
+                {
+                    Console.WriteLine($"✅ Respuesta: {resultado[0].Mensaje}");
+                    return resultado[0];
                 }
 
-                return new ResultadoCarritoDTO
+                return new RespuestaCarritoDTO
                 {
-                    Resultado = 0,
-                    Mensaje = "Error vaciando carrito"
+                    Mensaje = "Error al vaciar el carrito",
+                    Exito = 0
                 };
             }
             catch (Exception ex)
             {
-                return new ResultadoCarritoDTO
+                Console.WriteLine($"❌ Error en VaciarCarritoAsync: {ex.Message}");
+                return new RespuestaCarritoDTO
                 {
-                    Resultado = 0,
-                    Mensaje = ex.Message
+                    Mensaje = $"Error: {ex.Message}",
+                    Exito = 0
                 };
             }
         }
 
-        public async Task<int> ObtenerConteoItemsAsync()
+        /// <summary>
+        /// Obtiene el resumen del carrito (total y cantidad de items)
+        /// </summary>
+        public async Task<ResumenCarritoDTO> ObtenerResumenCarritoAsync(string correoUsuario)
         {
-            var carrito = await ObtenerCarritoAsync();
-            return carrito?.Items?.Count ?? 0;
+            try
+            {
+                Console.WriteLine($"📊 Obteniendo resumen del carrito de {correoUsuario}");
+
+                // Obtener resumen básico del carrito
+                var consultaResumen = "EXEC sp_ObtenerResumenCarrito @CorreoUsuario";
+                var parametros = new Dictionary<string, object>
+                {
+                    { "@CorreoUsuario", correoUsuario }
+                };
+
+                var resumen = await _apiService.EjecutarConsultaAsync<ResumenCarritoDTO>(
+                    consultaResumen,
+                    parametros
+                );
+
+                if (resumen != null && resumen.Count > 0)
+                {
+                    var resumenCarrito = resumen[0];
+
+                    // Obtener items del carrito
+                    resumenCarrito.Items = await ObtenerItemsCarritoAsync(correoUsuario);
+
+                    Console.WriteLine($"✅ Resumen: {resumenCarrito.CantidadItems} items, Total: ${resumenCarrito.Total}");
+                    return resumenCarrito;
+                }
+
+                // Si no hay carrito, devolver uno vacío
+                Console.WriteLine($"⚠️ No se encontró carrito para {correoUsuario}");
+                return new ResumenCarritoDTO
+                {
+                    CarritoID = Guid.Empty,
+                    Total = 0,
+                    CantidadItems = 0,
+                    Correo_usuario = correoUsuario,
+                    Items = new List<ItemCarritoDTO>()
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error en ObtenerResumenCarritoAsync: {ex.Message}");
+                return new ResumenCarritoDTO
+                {
+                    CarritoID = Guid.Empty,
+                    Total = 0,
+                    CantidadItems = 0,
+                    Correo_usuario = correoUsuario,
+                    Items = new List<ItemCarritoDTO>()
+                };
+            }
         }
 
-        public void NotificarActualizacion()
+        /// <summary>
+        /// Obtiene solo la cantidad de items en el carrito (más eficiente)
+        /// </summary>
+        public async Task<int> ObtenerCantidadItemsAsync(string correoUsuario)
         {
-            OnCarritoActualizado?.Invoke();
+            try
+            {
+                var resumen = await ObtenerResumenCarritoAsync(correoUsuario);
+                return resumen.CantidadItems;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error en ObtenerCantidadItemsAsync: {ex.Message}");
+                return 0;
+            }
         }
     }
 }
