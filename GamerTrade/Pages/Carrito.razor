@@ -1,224 +1,206 @@
-﻿@* @page "/carrito"
+﻿@page "/carrito"
 @using GamerTrade.Models.DTO
 @using GamerTrade.Services.Interfaces
 @inject ICarritoService CarritoService
-@inject IAuthService AuthService
-@inject IJSRuntime JS
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @inject NavigationManager Navigation
 
-<Header />
+<div class="carrito-container">
 
-<main class="main-content">
-    <div class="container mt-4">
-        <h2 class="mb-4">
-            <span class="bi bi-cart-fill me-2"></span>Mi Carrito de Compras
-        </h2>
+    <!-- Header -->
+    <div class="carrito-header">
+        <div>
+            <h1><i class="bi bi-cart3"></i> Mi Carrito</h1>
+            <p class="text-muted">Revisa y confirma tu compra</p>
+        </div>
 
-        @if (!UsuarioAutenticado)
-        {
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <strong>
-                    <span class="bi bi-exclamation-triangle me-2"></span>Acceso requerido
-                </strong>
-                <p class="mb-0">Debes <a href="/login" class="alert-link">iniciar sesión</a> para ver tu carrito.</p>
+        <button class="btn btn-outline-secondary" @onclick="@(() => Navigation.NavigateTo("/tienda"))">
+            <i class="bi bi-arrow-left"></i> Continuar comprando
+        </button>
+    </div>
+
+    @if (cargando)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-3 text-muted">Cargando carrito...</p>
+        </div>
+    }
+    else if (correoUsuario is null)
+    {
+        <div class="alerta-container alerta-warning">
+            <i class="bi bi-exclamation-triangle"></i>
+            <div>
+                <h4>Debes iniciar sesión</h4>
+                <p>Para ver tu carrito, necesitas estar autenticado</p>
             </div>
-        }
-        else if (Cargando)
-        {
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Cargando...</span>
-                </div>
+            <button class="btn btn-primary" @onclick="@(() => Navigation.NavigateTo("/login"))">
+                <i class="bi bi-box-arrow-in-right"></i> Ir al Login
+            </button>
+        </div>
+    }
+    else if (items is null || !items.Any())
+    {
+        <div class="carrito-vacio">
+            <div class="icono-vacio">
+                <i class="bi bi-cart-x"></i>
             </div>
-        }
-        else if (_carrito.Items.Count == 0)
-        {
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                <strong>
-                    <span class="bi bi-info-circle me-2"></span>Carrito vacío
-                </strong>
-                <p class="mb-0">No hay Juegos en tu carrito. <a href="/tienda" class="alert-link">Ir a la tienda</a></p>
-            </div>
-        }
-        else
-        {
-            <!-- Alertas de notificación -->
-            @if (!string.IsNullOrEmpty(MensajeExito))
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>
-                        <span class="bi bi-check-circle me-2"></span>Éxito
-                    </strong>
-                    <p class="mb-0">@MensajeExito</p>
-                    <button type="button" class="btn-close" @onclick="() => MensajeExito = string.Empty"></button>
-                </div>
-            }
+            <h3>Tu carrito está vacío</h3>
+            <p class="text-muted">Agrega juegos desde la tienda</p>
 
-            @if (!string.IsNullOrEmpty(MensajeError))
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>
-                        <span class="bi bi-exclamation-circle me-2"></span>Error
-                    </strong>
-                    <p class="mb-0">@MensajeError</p>
-                    <button type="button" class="btn-close" @onclick="() => MensajeError = string.Empty"></button>
-                </div>
-            }
+            <button class="btn btn-primary btn-lg" @onclick="@(() => Navigation.NavigateTo("/tienda"))">
+                <i class="bi bi-shop"></i> Ir a la Tienda
+            </button>
+        </div>
+    }
+    else
+    {
+        <!-- Carrito lleno -->
+        <div class="carrito-content">
 
-            <div class="row">
-                <!-- Tabla de Juegos -->
-                <div class="col-lg-8">
-                    <div class="card shadow-sm mb-4">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Juego</th>
-                                        <th>Precio Unitario</th>
-                                        <th>Cantidad</th>
-                                        <th>Subtotal</th>
-                                        <th>Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in _carrito.Items)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <strong>@item.Titulo</strong>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-success">${item.Precio:F2}</span>
-                                            </td>
-                                            <td>
-                                                <div class="input-group input-group-sm" style="width: 120px;">
-                                                    <button class="btn btn-outline-secondary"
-                                                            @onclick="async () => await DisminuirCantidad(item.JuegoId)"
-                                                            disabled="@(item.Cantidad <= 1 || Cargando)">
-                                                        −
-                                                    </button>
-                                                    <input type="number" class="form-control text-center"
-                                                           value="@item.Cantidad" readonly />
-                                                    <button class="btn btn-outline-secondary"
-                                                            @onclick="async () => await AumentarCantidad(item.JuegoId)"
-                                                            disabled="@Cargando">
-                                                        +
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="fw-bold">${(item.Precio * item.Cantidad):F2}</span>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-danger"
-                                                        @onclick="async () => await EliminarItem(item.JuegoId)"
-                                                        disabled="@Cargando">
-                                                    <span class="bi bi-trash"></span> Eliminar
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+            <!-- Items -->
+            <div class="items-section">
+                <h2 class="section-title">
+                    <i class="bi bi-list-check"></i> Artículos en tu carrito
+                </h2>
 
-                    <button type="button" class="btn btn-outline-secondary me-2" @onclick="IrAlaTienda" disabled="@Cargando">
-                        <span class="bi bi-arrow-left me-2"></span>Continuar comprando
-                    </button>
-                    <button type="button" class="btn btn-outline-danger" @onclick="VaciarTodo" disabled="@Cargando">
-                        <span class="bi bi-trash me-2"></span>Vaciar carrito
-                    </button>
-                </div>
+                <div class="items-grid">
 
-                <!-- Resumen del pedido -->
-                <div class="col-lg-4">
-                    <div class="card shadow-sm sticky-top" style="top: 20px;">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Resumen del Pedido</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <p class="d-flex justify-content-between">
-                                    <span>Subtotal:</span>
-                                    <strong>${_carrito.Total:F2}</strong>
-                                </p>
-                                <p class="d-flex justify-content-between">
-                                    <span>Envío:</span>
-                                    <strong>${CostoEnvio:F2}</strong>
-                                </p>
-                                <p class="d-flex justify-content-between">
-                                    <span>Impuesto (10%):</span>
-                                    <strong>${Impuesto:F2}</strong>
-                                </p>
+                    @foreach (var item in items)
+                    {
+                        <div class="item-card">
+
+                            <div class="item-imagen">
+                                <img src="@(string.IsNullOrEmpty(item.UrlImagen)
+                                                                         ? $"https://via.placeholder.com/150x150?text={Uri.EscapeDataString(item.Titulo ?? "Juego")}"
+                                                                         : item.UrlImagen)"
+                             alt="@item.Titulo" />
+
+                        @if (item.Calificacion.HasValue)
+                                {
+                                    <div class="item-rating">
+                                        <i class="bi bi-star-fill"></i>
+                                        @item.Calificacion.Value.ToString("F1")
+                                    </div>
+                                }
                             </div>
 
-                            <hr />
+                            <div class="item-detalles">
+                                <h4 class="item-titulo">@item.Titulo</h4>
 
-                            <h5 class="d-flex justify-content-between text-success mb-3">
-                                <span>Total a Pagar:</span>
-                                <span>${MontoTotal:F2}</span>
-                            </h5>
+                                <span class="badge-categoria">
+                                    <i class="bi bi-tag"></i> @item.CategoriaNombre
+                                </span>
+                            </div>
 
-                            <button type="button"
-                                    class="btn btn-success btn-lg w-100 mb-2"
-                                    @onclick="ProcederAlPago"
-                                    disabled="@(Cargando || _carrito.Items.Count == 0)">
-                                @if (Cargando)
-                                {
-                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                    <span>Procesando...</span>
-                                }
-                                else
-                                {
-                                    <span class="bi bi-credit-card me-2"></span>
-                                    <span>Proceder al Pago</span>
-                                }
-                            </button>
+                            <div class="item-precio">
+                                <span>Precio</span>
+                                <span class="precio-valor">$@item.Precio.ToString("N2")</span>
+                            </div>
 
-                            <small class="text-muted d-block">
-                                Al proceder, aceptas nuestros términos de servicio
-                            </small>
+                            <div class="item-acciones">
+                                <button class="btn-eliminar"
+                                        disabled="@eliminando"
+                                        title="Eliminar"
+                                        @onclick="() => EliminarDelCarrito(item.JuegoId)">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+
                         </div>
-                    </div>
+                    }
+
                 </div>
             </div>
-        }
-    </div>
-</main>
+
+            <!-- Resumen -->
+            <div class="resumen-section">
+
+                <div class="resumen-card">
+                    <h2 class="section-title"><i class="bi bi-receipt"></i> Resumen</h2>
+
+                    <div class="resumen-detalles">
+                        <div class="detalle-fila">
+                            <span>Artículos:</span>
+                            <span>@items.Count</span>
+                        </div>
+
+                        <div class="detalle-fila">
+                            <span>Subtotal:</span>
+                            <span>$@total.ToString("N2")</span>
+                        </div>
+
+                        <div class="detalle-fila">
+                            <span>Impuestos (0%):</span>
+                            <span>$0.00</span>
+                        </div>
+
+                        <div class="detalle-fila">
+                            <span>Envío:</span>
+                            <span class="texto-verde">Gratis</span>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="detalle-fila total">
+                            <span>Total a pagar:</span>
+                            <span class="total-valor">$@total.ToString("N2")</span>
+                        </div>
+                    </div>
+
+                    <button class="btn-comprar" @onclick="ProcederAlCheckout">
+                        <i class="bi bi-credit-card"></i> Proceder al Pago
+                    </button>
+
+                    <button class="btn-continuar" @onclick="@(() => Navigation.NavigateTo("/tienda"))">
+                        <i class="bi bi-arrow-left"></i> Continuar comprando
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(mensaje))
+    {
+        <div class="alerta-container @(mensajeExito ? "alerta-success" : "alerta-error")">
+            <i class="bi @(mensajeExito ? "bi-check-circle" : "bi-exclamation-circle")"></i>
+            <span>@mensaje</span>
+
+            <button class="btn-cerrar" @onclick="@(() => mensaje = string.Empty)">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+    }
+
+</div>
+
 
 @code {
-    private CarritoDTO _carrito = new();
-    private bool Cargando = false;
-    private bool UsuarioAutenticado = false;
-    private string MensajeExito = string.Empty;
-    private string MensajeError = string.Empty;
-    private const decimal COSTO_ENVIO = 9.99m;
-
-    private decimal CostoEnvio => _carrito.Items.Count > 0 ? COSTO_ENVIO : 0;
-    private decimal Impuesto => _carrito.Total * 0.1m;
-    private decimal MontoTotal => _carrito.Total + CostoEnvio + Impuesto;
+    private List<ItemCarritoDTO>? items;
+    private decimal total;
+    private string? correoUsuario;
+    private bool cargando = true;
+    private bool eliminando = false;
+    private string? mensaje;
+    private bool mensajeExito;
 
     protected override async Task OnInitializedAsync()
     {
-        await VerificarAutenticacion();
-        if (UsuarioAutenticado)
-        {
-            await CargarCarrito();
-        }
-    }
-
-    private async Task VerificarAutenticacion()
-    {
         try
         {
-            var usuario = await AuthService.ObtenerUsuarioActualAsync();
-            UsuarioAutenticado = usuario != null;
+            correoUsuario = await LocalStorage.GetItemAsync<string>("userEmail");
+
+            if (correoUsuario is not null)
+                await CargarCarrito();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al verificar autenticación: {ex.Message}");
-            UsuarioAutenticado = false;
+            Console.WriteLine($"Error al inicializar: {ex.Message}");
+        }
+        finally
+        {
+            cargando = false;
         }
     }
 
@@ -226,177 +208,62 @@
     {
         try
         {
-            Cargando = true;
-            MensajeError = string.Empty;
-            _carrito = await CarritoService.ObtenerCarritoAsync();
+            items = await CarritoService.ObtenerItemsCarritoAsync(correoUsuario!);
+            total = await CarritoService.ObtenerTotalCarritoAsync(correoUsuario!);
         }
         catch (Exception ex)
         {
-            MensajeError = "Error al cargar el carrito. Por favor, intenta de nuevo.";
-            Console.WriteLine($"Error al cargar carrito: {ex.Message}");
-        }
-        finally
-        {
-            Cargando = false;
-            StateHasChanged();
+            mensaje = "Error al cargar carrito";
+            mensajeExito = false;
+            Console.WriteLine(ex);
         }
     }
 
-    private async Task AumentarCantidad(int juegoId)
+    private async Task EliminarDelCarrito(int juegoId)
     {
         try
         {
-            Cargando = true;
-            MensajeError = string.Empty;
-            var item = _carrito.Items.FirstOrDefault(i => i.JuegoId == juegoId);
+            eliminando = true;
 
-            if (item != null)
+            bool ok = await CarritoService.EliminarDelCarritoAsync(correoUsuario!, juegoId);
+
+            if (ok)
             {
-                var resultado = await CarritoService.ActualizarCantidadAsync(juegoId, item.Cantidad + 1);
-                if (resultado)
-                {
-                    item.Cantidad++;
-                    MensajeExito = $"Cantidad de '{item.Titulo}' actualizada.";
-                }
-                else
-                {
-                    MensajeError = "No se pudo actualizar la cantidad.";
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            MensajeError = "Error al actualizar cantidad.";
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            Cargando = false;
-            StateHasChanged();
-        }
-    }
+                mensaje = "Juego eliminado del carrito";
+                mensajeExito = true;
 
-    private async Task DisminuirCantidad(int juegoId)
-    {
-        try
-        {
-            Cargando = true;
-            MensajeError = string.Empty;
-            var item = _carrito.Items.FirstOrDefault(i => i.JuegoId == juegoId);
-
-            if (item != null && item.Cantidad > 1)
-            {
-                var resultado = await CarritoService.ActualizarCantidadAsync(juegoId, item.Cantidad - 1);
-                if (resultado)
-                {
-                    item.Cantidad--;
-                    MensajeExito = $"Cantidad de '{item.Titulo}' actualizada.";
-                }
-                else
-                {
-                    MensajeError = "No se pudo actualizar la cantidad.";
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            MensajeError = "Error al actualizar cantidad.";
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            Cargando = false;
-            StateHasChanged();
-        }
-    }
-
-    private async Task EliminarItem(int juegoId)
-    {
-        try
-        {
-            Cargando = true;
-            MensajeError = string.Empty;
-            var item = _carrito.Items.FirstOrDefault(i => i.JuegoId == juegoId);
-            var resultado = await CarritoService.RemoverItemAsync(juegoId);
-
-            if (resultado)
-            {
-                _carrito.Items.RemoveAll(i => i.JuegoId == juegoId);
-                MensajeExito = $"'{item?.Titulo ?? "Juego"}' eliminado del carrito.";
+                await CargarCarrito();   // Refrescar
             }
             else
             {
-                MensajeError = "No se pudo eliminar el Juego.";
+                mensaje = "No se pudo eliminar el juego";
+                mensajeExito = false;
             }
         }
-        catch (Exception ex)
+        catch
         {
-            MensajeError = "Error al eliminar el Juego.";
-            Console.WriteLine($"Error: {ex.Message}");
+            mensaje = "Error al eliminar";
+            mensajeExito = false;
         }
         finally
         {
-            Cargando = false;
-            StateHasChanged();
+            eliminando = false;
         }
+
+        await Task.Delay(3000);
+        mensaje = string.Empty;
+        StateHasChanged();
     }
 
-    private async Task VaciarTodo()
+    private void ProcederAlCheckout()
     {
-        if (await JS.InvokeAsync<bool>("confirm", "¿Estás seguro de que deseas vaciar el carrito completamente?"))
+        if (items is null || items.Count == 0)
         {
-            try
-            {
-                Cargando = true;
-                MensajeError = string.Empty;
-                var resultado = await CarritoService.VaciarCarritoAsync();
-
-                if (resultado)
-                {
-                    _carrito.Items.Clear();
-                    MensajeExito = "Carrito vaciado correctamente.";
-                }
-                else
-                {
-                    MensajeError = "No se pudo vaciar el carrito.";
-                }
-            }
-            catch (Exception ex)
-            {
-                MensajeError = "Error al vaciar el carrito.";
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-            finally
-            {
-                Cargando = false;
-                StateHasChanged();
-            }
-        }
-    }
-
-    private async Task ProcederAlPago()
-    {
-        if (_carrito.Items.Count == 0)
-        {
-            MensajeError = "No puedes proceder al pago con un carrito vacío.";
+            mensaje = "Tu carrito está vacío";
+            mensajeExito = false;
             return;
         }
 
-        try
-        {
-            // Aquí irá la lógica de pago
-            await JS.InvokeVoidAsync("alert", $"Proceder al pago con total de: ${MontoTotal:F2}");
-            // Navigation.NavigateTo("/pago");
-        }
-        catch (Exception ex)
-        {
-            MensajeError = "Error al procesar el pago.";
-            Console.WriteLine($"Error: {ex.Message}");
-        }
+        Navigation.NavigateTo("/checkout");
     }
-
-    private async Task IrAlaTienda()
-    {
-        Navigation.NavigateTo("/tienda");
-    }
-} *@
+}

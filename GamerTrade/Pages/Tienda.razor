@@ -7,6 +7,12 @@
     <!-- Header de la tienda -->
     <div class="tienda-header">
         <h1><i class="bi bi-shop"></i> Tienda de Juegos</h1>
+        <div class="carrito-btn-container">
+            <button class="btn-carrito" @onclick="IrCarrito">
+                <i class="bi bi-cart3"></i>
+            </button>
+        </div>
+
         <p class="text-muted">Descubre los mejores juegos para tu colección</p>
     </div>
 
@@ -218,6 +224,12 @@
         Console.WriteLine($"🎮 Navegando al detalle del juego {juegoId}");
         Navigation.NavigateTo($"/juego/{juegoId}");
     }
+
+    private void IrCarrito()
+    {
+        Navigation.NavigateTo("/carrito");
+    }
+
 }
 
 
