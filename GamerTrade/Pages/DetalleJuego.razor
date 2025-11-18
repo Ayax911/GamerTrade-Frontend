@@ -1,0 +1,407 @@
+﻿@page "/juego/{id:int}"
+@using GamerTrade.Models.DTO
+@inject GamerTrade.Services.Interfaces.IJuegoService JuegoService
+@inject NavigationManager Navigation
+
+<div class="detalle-container">
+    <!-- Sistema de notificaciones Toast -->
+    @if (mostrarNotificacion)
+    {
+        <div class="toast-notification @tipoNotificacion show">
+            <div class="toast-content">
+                @if (tipoNotificacion == "success")
+                {
+                    <i class="bi bi-check-circle-fill"></i>
+                }
+                else if (tipoNotificacion == "info")
+                {
+                    <i class="bi bi-info-circle-fill"></i>
+                }
+                else if (tipoNotificacion == "error")
+                {
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                }
+                <span>@mensajeNotificacion</span>
+            </div>
+            <button class="toast-close" @onclick="CerrarNotificacion">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+    }
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-3 text-muted">Cargando información del juego...</p>
+        </div>
+    }
+    else if (juego == null)
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-exclamation-triangle fs-1 text-warning"></i>
+            <h3 class="mt-3">Juego no encontrado</h3>
+            <button class="btn btn-primary mt-3" @onclick="VolverATienda">
+                <i class="bi bi-arrow-left"></i> Volver a la tienda
+            </button>
+        </div>
+    }
+    else
+    {
+        <!-- Header con botón de regreso -->
+        <div class="detalle-header">
+            <button class="btn-back" @onclick="VolverATienda">
+                <i class="bi bi-arrow-left"></i> Volver a la tienda
+            </button>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="detalle-content">
+            <!-- Imagen del juego -->
+            <div class="detalle-imagen">
+                <img src="@(string.IsNullOrEmpty(juego.UrlImagen) ? $"https://via.placeholder.com/500x600?text={Uri.EscapeDataString(juego.Titulo)}" : juego.UrlImagen)"
+                     alt="@juego.Titulo" />
+
+                @if (juego.Calificacion.HasValue)
+                {
+                    <div class="rating-overlay">
+                        <i class="bi bi-star-fill"></i>
+                        <span>@juego.Calificacion.Value</span>
+                    </div>
+                }
+            </div>
+
+            <!-- Información del juego -->
+            <div class="detalle-info">
+                <h1 class="juego-titulo">@juego.Titulo</h1>
+
+                <div class="juego-meta">
+                    <span class="badge-categoria">
+                        <i class="bi bi-tag-fill"></i> @juego.CategoriaNombre
+                    </span>
+                    <span class="badge-fecha">
+                        <i class="bi bi-calendar-event"></i> @juego.FechaFormateada
+                    </span>
+                </div>
+
+                @if (!string.IsNullOrEmpty(juego.Versión))
+                {
+                    <p class="juego-version">
+                        <strong>Versión:</strong> @juego.Versión
+                    </p>
+                }
+
+                <div class="juego-precio-container">
+                    <span class="juego-precio">$@juego.Precio.ToString("N2") COP</span>
+                </div>
+
+                <!-- Información del desarrollador -->
+                <div class="desarrollador-info">
+                    <i class="bi bi-code-square"></i>
+                    <strong>Desarrollador:</strong> @juego.DesarrolladorNombre
+                </div>
+
+                <!-- Estadísticas -->
+                <div class="estadisticas">
+                    <div class="stat-item">
+                        <i class="bi bi-download"></i>
+                        <div>
+                            <span class="stat-value">@juego.CantidadDescargas.ToString("N0")</span>
+                            <span class="stat-label">Descargas</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <i class="bi bi-cash-coin"></i>
+                        <div>
+                            <span class="stat-value">$@juego.TotalRecaudado.ToString("N2")</span>
+                            <span class="stat-label">Recaudado</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Descripción de la categoría -->
+                @if (!string.IsNullOrEmpty(juego.CategoriaDescripcion))
+                {
+                    <div class="descripcion-categoria">
+                        <h5><i class="bi bi-info-circle"></i> Acerca de esta categoría</h5>
+                        <p>@juego.CategoriaDescripcion</p>
+                    </div>
+                }
+
+                <!-- Botones de acción -->
+                <div class="acciones-container">
+                    <button class="btn-accion btn-comprar @(juegoAgregado ? "agregado" : "")"
+                            @onclick="AgregarAlCarrito"
+                            disabled="@(agregandoCarrito || juegoAgregado)">
+                        @if (agregandoCarrito)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            <span>Agregando...</span>
+                        }
+                        else if (juegoAgregado)
+                        {
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>¡Agregado!</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-cart-plus"></i>
+                            <span>Agregar al Carrito</span>
+                        }
+                    </button>
+
+                    <button class="btn-accion btn-intercambiar"
+                            @onclick="SolicitarIntercambio"
+                            disabled="@procesandoIntercambio">
+                        @if (procesandoIntercambio)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            <span>Procesando...</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-arrow-left-right"></i>
+                            <span>Intercambiar</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de reseñas -->
+        <div class="resenas-section">
+            <h3 class="resenas-titulo">
+                <i class="bi bi-chat-left-quote"></i> Reseñas de Usuarios
+                <span class="badge bg-secondary">@resenas.Count</span>
+            </h3>
+
+            @if (loadingResenas)
+            {
+                <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                    <span class="ms-2">Cargando reseñas...</span>
+                </div>
+            }
+            else if (!resenas.Any())
+            {
+                <div class="sin-resenas">
+                    <i class="bi bi-chat-dots"></i>
+                    <p>Aún no hay reseñas para este juego. ¡Sé el primero en opinar!</p>
+                </div>
+            }
+            else
+            {
+                <div class="resenas-grid">
+                    @foreach (var resena in resenas)
+                    {
+                        <div class="resena-card">
+                            <div class="resena-header">
+                                <div class="usuario-info">
+                                    <i class="bi bi-person-circle"></i>
+                                    <span class="usuario-nombre">@resena.NombreUsuario</span>
+                                </div>
+                                <div class="resena-rating">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="bi @(i <= resena.Calificacion ? "bi-star-fill" : "bi-star")"></i>
+                                    }
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(resena.Descripcion))
+                            {
+                                <p class="resena-descripcion">@resena.Descripcion</p>
+                            }
+
+                            <span class="resena-fecha">
+                                <i class="bi bi-clock"></i> @resena.FechaFormateada
+                            </span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private JuegoDetalleDTO? juego;
+    private List<ResenaDTO> resenas = new();
+    private bool isLoading = true;
+    private bool loadingResenas = false;
+
+    // Estados para los botones
+    private bool agregandoCarrito = false;
+    private bool juegoAgregado = false;
+    private bool procesandoIntercambio = false;
+
+    // Estado de notificación
+    private string? mensajeNotificacion;
+    private string tipoNotificacion = "success"; // success, info, warning
+    private bool mostrarNotificacion = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarDetalleJuego();
+    }
+
+    private async Task CargarDetalleJuego()
+    {
+        isLoading = true;
+
+        try
+        {
+            // Cargar detalle del juego
+            juego = await JuegoService.ObtenerDetalleJuegoAsync(Id);
+
+            if (juego != null)
+            {
+                // Cargar reseñas en paralelo (no bloquea la UI principal)
+                _ = CargarResenas();
+            }
+            else
+            {
+                Console.WriteLine($"⚠ No se encontró el juego con ID: {Id}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($" Error cargando detalle del juego: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task CargarResenas()
+    {
+        loadingResenas = true;
+
+        try
+        {
+            resenas = await JuegoService.ObtenerResenasJuegoAsync(Id);
+            Console.WriteLine($" Cargadas {resenas.Count} reseñas");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($" Error cargando reseñas: {ex.Message}");
+            resenas = new List<ResenaDTO>();
+        }
+        finally
+        {
+            loadingResenas = false;
+            StateHasChanged(); // Forzar actualización de la UI
+        }
+    }
+
+    private async Task AgregarAlCarrito()
+    {
+        if (agregandoCarrito || juegoAgregado) return;
+
+        agregandoCarrito = true;
+        StateHasChanged();
+
+        try
+        {
+            // Simulación de llamada al backend (reemplazar con lógica real)
+            await Task.Delay(800); // Simula latencia de red
+
+            // TODO: Implementar lógica real del carrito
+            // await CarritoService.AgregarJuegoAsync(Id);
+
+            Console.WriteLine($" Juego '{juego?.Titulo}' (ID: {Id}) agregado al carrito");
+
+            // Marcar como agregado
+            juegoAgregado = true;
+
+            // Mostrar notificación de éxito
+            MostrarNotificacion($"¡'{juego?.Titulo}' agregado al carrito!", "success");
+
+            // Resetear después de 3 segundos
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(3000);
+                juegoAgregado = false;
+                StateHasChanged();
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($" Error al agregar al carrito: {ex.Message}");
+            MostrarNotificacion("Error al agregar el juego. Intenta nuevamente.", "error");
+        }
+        finally
+        {
+            agregandoCarrito = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SolicitarIntercambio()
+    {
+        if (procesandoIntercambio) return;
+
+        procesandoIntercambio = true;
+        StateHasChanged();
+
+        try
+        {
+            // Simulación de llamada al backend (reemplazar con lógica real)
+            await Task.Delay(1000);
+
+            // TODO: Implementar sistema de intercambio
+            // await IntercambioService.CrearSolicitudAsync(Id);
+
+            Console.WriteLine($" Solicitud de intercambio creada para '{juego?.Titulo}' (ID: {Id})");
+
+            // Mostrar notificación informativa
+            MostrarNotificacion(
+                "Sistema de intercambio disponible próximamente. ¡Estamos trabajando en ello!",
+                "info"
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($" Error al solicitar intercambio: {ex.Message}");
+            MostrarNotificacion("Error al procesar la solicitud. Intenta nuevamente.", "error");
+        }
+        finally
+        {
+            procesandoIntercambio = false;
+            StateHasChanged();
+        }
+    }
+
+    private void MostrarNotificacion(string mensaje, string tipo)
+    {
+        mensajeNotificacion = mensaje;
+        tipoNotificacion = tipo;
+        mostrarNotificacion = true;
+        StateHasChanged();
+
+        // Auto-ocultar después de 4 segundos
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(4000);
+            mostrarNotificacion = false;
+            StateHasChanged();
+        });
+    }
+
+    private void CerrarNotificacion()
+    {
+        mostrarNotificacion = false;
+        StateHasChanged();
+    }
+
+    private void VolverATienda()
+    {
+        Navigation.NavigateTo("/tienda");
+    }
+}

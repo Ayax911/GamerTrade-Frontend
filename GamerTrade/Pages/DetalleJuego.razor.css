@@ -1,0 +1,575 @@
+﻿/* Contenedor principal */
+.detalle-container {
+    background-color: #000;
+    color: #fff;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Header con botón de regreso */
+.detalle-header {
+    margin-bottom: 30px;
+}
+
+.btn-back {
+    background-color: transparent;
+    border: 2px solid #257cff;
+    color: #257cff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .btn-back:hover {
+        background-color: #257cff;
+        color: #fff;
+        transform: translateX(-5px);
+    }
+
+/* Contenido principal */
+.detalle-content {
+    display: grid;
+    grid-template-columns: 500px 1fr;
+    gap: 50px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Imagen del juego */
+.detalle-imagen {
+    position: relative;
+}
+
+    .detalle-imagen img {
+        width: 100%;
+        height: auto;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(37, 124, 255, 0.3);
+        transition: transform 0.3s ease;
+    }
+
+        .detalle-imagen img:hover {
+            transform: scale(1.02);
+        }
+
+.rating-overlay {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: rgba(0, 0, 0, 0.85);
+    padding: 10px 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+    .rating-overlay i {
+        color: #ffc107;
+    }
+
+/* Información del juego */
+.detalle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.juego-titulo {
+    font-size: 42px;
+    font-weight: bold;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.juego-meta {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.badge-categoria, .badge-fecha {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.badge-categoria {
+    background-color: #a8ffb0;
+    color: #000;
+}
+
+.badge-fecha {
+    background-color: #2a2a2a;
+    color: #ccc;
+}
+
+.juego-version {
+    color: #aaa;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Precio */
+.juego-precio-container {
+    margin: 10px 0;
+}
+
+.juego-precio {
+    font-size: 32px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(135deg, #257cff 0%, #1b5fd8 100%);
+    padding: 15px 25px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+/* Desarrollador */
+.desarrollador-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    border-left: 4px solid #257cff;
+}
+
+    .desarrollador-info i {
+        font-size: 24px;
+        color: #257cff;
+    }
+
+/* Estadísticas */
+.estadisticas {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.stat-item {
+    background-color: #1a1a1a;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .stat-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(37, 124, 255, 0.2);
+    }
+
+    .stat-item i {
+        font-size: 32px;
+        color: #257cff;
+    }
+
+    .stat-item div {
+        display: flex;
+        flex-direction: column;
+    }
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #888;
+}
+
+/* Descripción de categoría */
+.descripcion-categoria {
+    background-color: #1a1a1a;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+    .descripcion-categoria h5 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        color: #257cff;
+    }
+
+    .descripcion-categoria p {
+        color: #ccc;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+/* Botones de acción */
+.acciones-container {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-accion {
+    flex: 1;
+    padding: 18px;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+    .btn-accion:disabled {
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    .btn-accion span {
+        display: inline-flex;
+        align-items: center;
+    }
+
+/* Botón de comprar */
+.btn-comprar {
+    background-color: #fff;
+    color: #000;
+}
+
+    .btn-comprar:not(:disabled):hover {
+        background-color: #257cff;
+        color: #fff;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(37, 124, 255, 0.4);
+    }
+
+    .btn-comprar.agregado {
+        background-color: #28a745;
+        color: #fff;
+    }
+
+        .btn-comprar.agregado:hover {
+            background-color: #28a745;
+            transform: none;
+        }
+
+/* Botón de intercambiar */
+.btn-intercambiar {
+    background-color: #2a2a2a;
+    color: #fff;
+    border: 2px solid #555;
+}
+
+    .btn-intercambiar:not(:disabled):hover {
+        background-color: #a8ffb0;
+        color: #000;
+        border-color: #a8ffb0;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(168, 255, 176, 0.3);
+    }
+
+/* Spinner en botones */
+.btn-accion .spinner-border {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-width: 2px;
+}
+
+/* Sistema de notificaciones Toast */
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #fff;
+    color: #000;
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    min-width: 320px;
+    max-width: 500px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+    .toast-notification.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+    .toast-content i {
+        font-size: 24px;
+    }
+
+    .toast-content span {
+        font-weight: 500;
+        font-size: 15px;
+        line-height: 1.4;
+    }
+
+/* Tipos de notificación */
+.toast-notification.success {
+    border-left: 5px solid #28a745;
+}
+
+    .toast-notification.success i {
+        color: #28a745;
+    }
+
+.toast-notification.info {
+    border-left: 5px solid #17a2b8;
+}
+
+    .toast-notification.info i {
+        color: #17a2b8;
+    }
+
+.toast-notification.error {
+    border-left: 5px solid #dc3545;
+}
+
+    .toast-notification.error i {
+        color: #dc3545;
+    }
+
+.toast-notification.warning {
+    border-left: 5px solid #ffc107;
+}
+
+    .toast-notification.warning i {
+        color: #ffc107;
+    }
+
+/* Botón cerrar toast */
+.toast-close {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+    .toast-close:hover {
+        color: #000;
+    }
+
+    .toast-close i {
+        font-size: 20px;
+    }
+
+/* Sección de reseñas */
+.resenas-section {
+    max-width: 1400px;
+    margin: 50px auto 0;
+    padding: 40px 20px;
+    background-color: #0a0a0a;
+    border-radius: 15px;
+}
+
+.resenas-titulo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+    .resenas-titulo i {
+        color: #257cff;
+    }
+
+.sin-resenas {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+    .sin-resenas i {
+        font-size: 64px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+/* Grid de reseñas */
+.resenas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.resena-card {
+    background-color: #1a1a1a;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #2a2a2a;
+    transition: all 0.3s ease;
+}
+
+    .resena-card:hover {
+        border-color: #257cff;
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(37, 124, 255, 0.2);
+    }
+
+.resena-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.usuario-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .usuario-info i {
+        font-size: 24px;
+        color: #257cff;
+    }
+
+.usuario-nombre {
+    font-weight: 600;
+    color: #fff;
+}
+
+.resena-rating {
+    display: flex;
+    gap: 3px;
+}
+
+    .resena-rating i {
+        font-size: 16px;
+    }
+
+    .resena-rating .bi-star-fill {
+        color: #ffc107;
+    }
+
+    .resena-rating .bi-star {
+        color: #555;
+    }
+
+.resena-descripcion {
+    color: #ccc;
+    line-height: 1.6;
+    margin: 15px 0;
+}
+
+.resena-fecha {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: #888;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .detalle-content {
+        grid-template-columns: 400px 1fr;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 992px) {
+    .detalle-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .detalle-imagen img {
+        max-width: 500px;
+        margin: 0 auto;
+        display: block;
+    }
+
+    .juego-titulo {
+        font-size: 32px;
+    }
+
+    .acciones-container {
+        flex-direction: column;
+    }
+
+    .resenas-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .detalle-container {
+        padding: 10px;
+    }
+
+    .juego-titulo {
+        font-size: 24px;
+    }
+
+    .juego-precio {
+        font-size: 24px;
+        padding: 12px 20px;
+    }
+
+    .estadisticas {
+        grid-template-columns: 1fr;
+    }
+
+    .btn-accion {
+        font-size: 16px;
+        padding: 15px;
+    }
+
+    /* Toast responsive */
+    .toast-notification {
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+        max-width: none;
+        top: 10px;
+    }
+
+    .toast-content span {
+        font-size: 14px;
+    }
+}

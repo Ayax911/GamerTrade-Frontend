@@ -75,9 +75,9 @@
         <div class="juegos-grid">
             @foreach (var juego in juegosFiltrados)
             {
-                <div class="game-card">
+                <div class="game-card clickable" @onclick="() => IrADetalle(juego.JuegoID)">
                     <div class="game-image">
-                        <img src="https://via.placeholder.com/300x200?text=@Uri.EscapeDataString(juego.Titulo)"
+                        <img src="@(string.IsNullOrEmpty(juego.UrlImagen) ? $"https://via.placeholder.com/300x200?text={Uri.EscapeDataString(juego.Titulo)}" : juego.UrlImagen)"
                              alt="@juego.Titulo" />
                         @if (juego.Calificacion.HasValue)
                         {
@@ -90,10 +90,19 @@
                     <div class="game-content">
                         <h5 class="game-title">@juego.Titulo</h5>
                         <p class="game-version text-muted">@juego.Versión</p>
+                        
+                        @if (!string.IsNullOrEmpty(juego.CategoriaNombre))
+                        {
+                            <span class="game-category">
+                                <i class="bi bi-tag"></i> @juego.CategoriaNombre
+                            </span>
+                        }
 
                         <div class="game-footer">
                             <span class="game-price">$@juego.Precio.ToString("N2")</span>
-                            <button class="btn btn-primary btn-sm" @onclick="() => AgregarAlCarrito(juego.JuegoID)">
+                            <button class="btn btn-primary btn-sm" 
+                                    @onclick="() => AgregarAlCarrito(juego.JuegoID)"
+                                    @onclick:stopPropagation="true">
                                 <i class="bi bi-cart-plus"></i> Agregar
                             </button>
                         </div>
@@ -202,6 +211,12 @@
         // TODO: Implementar en Fase 4
         Console.WriteLine($"🛒 Agregar juego {juegoId} al carrito");
         // Por ahora, solo mostrar mensaje
+    }
+
+    private void IrADetalle(int juegoId)
+    {
+        Console.WriteLine($"🎮 Navegando al detalle del juego {juegoId}");
+        Navigation.NavigateTo($"/juego/{juegoId}");
     }
 }
 

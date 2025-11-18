@@ -2,12 +2,6 @@
    CONTENEDOR PRINCIPAL
 ================================== */
 
-
-.tienda-page {
-    background: #000000;
-    min-height: 100vh;
-}
-
 .tienda-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -150,6 +144,9 @@
     box-shadow: 0 0 20px rgba(0, 200, 255, 0.45);
     backdrop-filter: blur(6px);
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
 }
 
     .game-card:hover {
@@ -197,7 +194,14 @@
     font-size: 0.9rem;
     font-weight: 600;
     backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
+
+    .rating-badge i {
+        color: #ffc107;
+    }
 
 /* ================================
    CONTENIDO DEL JUEGO
@@ -205,23 +209,53 @@
 
 .game-content {
     padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .game-title {
     font-size: 1.1rem;
     font-weight: 600;
-    margin-bottom: 5px;
+    margin: 0;
     color: #00eaff;
+    line-height: 1.3;
+    min-height: 2.6em;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .game-version {
     font-size: 0.85rem;
-    margin-bottom: 15px;
+    margin: 0;
     color: #a8ccd7;
 }
+
+/* ================================
+   BADGE DE CATEGORÍA
+================================== */
+
+.game-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: rgba(0, 200, 255, 0.2);
+    color: #00eaff;
+    border: 1px solid rgba(0, 200, 255, 0.4);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    width: fit-content;
+}
+
+    .game-category i {
+        font-size: 0.7rem;
+    }
 
 /* ================================
    PIE DE LA TARJETA
@@ -232,6 +266,9 @@
     justify-content: space-between;
     align-items: center;
     gap: 10px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0, 200, 255, 0.2);
 }
 
 .game-price {
@@ -246,39 +283,82 @@
     border-radius: 8px !important;
 }
 
+.game-footer button {
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+    .game-footer button:hover:not(:disabled) {
+        transform: scale(1.05);
+    }
+
+    .game-footer button:active:not(:disabled) {
+        transform: scale(0.98);
+    }
+
+/* ================================
+   ESTADOS DE CARGA
+================================== */
+
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #a8ccd7 !important;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    color: #00eaff !important;
+}
+
 /* ================================
    RESPONSIVE
 ================================== */
 
 @media (max-width: 768px) {
     .juegos-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 15px;
     }
 
     .tienda-header h1 {
         font-size: 2rem;
     }
-}
-
-@media (max-width: 480px) {
-    .tienda-container {
-        padding: 15px 10px;
-    }
 
     .filtros-container {
         padding: 15px;
     }
+}
 
-    .juegos-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 15px;
+@media (max-width: 576px) {
+    .tienda-container {
+        padding: 15px 10px;
     }
 
     .tienda-header h1 {
         font-size: 1.5rem;
     }
 
-    .game-image {
-        height: 120px;
+    .juegos-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .game-card {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .filtros-container .row {
+        flex-direction: column;
+    }
+
+    .filtros-container .col-md-5,
+    .filtros-container .col-md-4,
+    .filtros-container .col-md-3 {
+        flex: 1 1 100%;
     }
 }
