@@ -1,33 +1,14 @@
 body {
-    font-family: 'Poppins', sans-serif;
-    background-image: url("/img/fondo.jpg");
+    background: url("/img/fondo.jpg") no-repeat center center fixed;
     background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     margin: 0;
-    height: 100vh;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    color: white;
 }
 
-/* Contenedor que centra todo */
-.login-wrapper {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #121212;
-}
 
-/* Tarjeta del login */
-.login-card {
-    width: 350px;
-    background: #1f1f1f;
-    padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-    text-align: center;
-    animation: fadeIn 0.5s ease-out;
-}
+
 
 /* Animación suave */
 @keyframes fadeIn {
@@ -55,36 +36,5 @@ body {
     font-weight: 600;
 }
 
-/* Inputs */
-.input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    border: none;
-    background: #2b2b2b;
-    color: #fff;
-    font-size: 15px;
-}
 
-    .input:focus {
-        outline: 2px solid #0E6E63;
-    }
 
-/* Botón */
-.btn-login {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: none;
-    background: #0E6E63;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-    .btn-login:hover {
-        background: #0c5b52;
-        transform: translateY(-2px);
-    }

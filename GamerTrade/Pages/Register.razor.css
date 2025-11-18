@@ -1,2 +1,149 @@
-﻿body {
+﻿/* ================================
+   CONTENEDOR PRINCIPAL
+================================== */
+
+.register-page {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+
+.register-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ================================
+   CAJA DEL REGISTRO
+================================== */
+
+.register-box {
+    background: rgba(0, 0, 0, 0.70);
+    padding: 30px 28px;
+    width: 380px;
+    border-radius: 16px;
+    color: #eaffff;
+    text-align: center;
+    border: 1px solid rgba(0, 200, 255, 0.35);
+    box-shadow: 0 0 20px rgba(0, 200, 255, 0.45);
+    backdrop-filter: blur(6px);
+}
+
+/* ================================
+   ENCABEZADO
+================================== */
+
+.register-header h2 {
+    color: #00eaff;
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 26px;
+}
+
+.register-header p {
+    color: #b8eaff;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+/* ================================
+   INPUTS ESTILO GAMING SUAVE
+================================== */
+
+.form-group {
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+    .form-group label {
+        font-weight: 500;
+        margin-bottom: 4px;
+        display: block;
+        color: #d1f7ff;
+        text-align: left;
+    }
+
+.form-control {
+    width: 100%;
+    background: rgba(12, 12, 12, 0.75);
+    border: 1px solid rgba(0, 200, 255, 0.35);
+    color: #eaffff;
+    border-radius: 8px;
+    padding: 10px 12px;
+    height: 42px;
+    font-size: 15px;
+    transition: 0.25s;
+}
+
+    .form-control:focus {
+        background: rgba(20, 20, 20, 0.92);
+        border-color: #00eaff;
+        box-shadow: 0 0 10px rgba(0, 233, 255, 0.45);
+        outline: none;
+    }
+
+    .form-control::placeholder {
+        color: #8cccd9;
+    }
+
+/* ================================
+   BOTÓN PRINCIPAL
+================================== */
+
+.btn-primary {
+    background: #00a6ff !important;
+    border: none !important;
+    padding: 10px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 16px;
+    width: 100%;
+    transition: 0.25s ease !important;
+    margin-top: 12px;
+}
+
+    .btn-primary:hover:not(:disabled) {
+        background: #0090e0 !important;
+        transform: scale(1.02);
+        box-shadow: 0 0 10px rgba(0, 204, 255, 0.45);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.7 !important;
+        box-shadow: none !important;
+    }
+
+/* ================================
+   ENLACES
+================================== */
+
+.text-center {
+    margin-top: 16px;
+}
+
+    .text-center a {
+        color: #00eaff !important;
+        font-weight: 500;
+    }
+
+        .text-center a:hover {
+            text-decoration: underline;
+        }
+
+.text-muted {
+    color: #a8ccd7 !important;
+}
+
+/* ================================
+   VALIDACIÓN
+================================== */
+
+.text-danger {
+    font-size: 13px;
+    margin-top: 5px;
 }

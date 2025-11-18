@@ -5,16 +5,8 @@
     box-sizing: border-box;
 }
 
-body {
-    background: url("/img/fondo.jpg") center/cover no-repeat;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: "Segoe UI", sans-serif;
-    color: white;
-    overflow: hidden;
-}
+
+
 
 /* Contenedor principal */
 .container {

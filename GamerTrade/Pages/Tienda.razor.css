@@ -1,8 +1,16 @@
-﻿.tienda-container {
+﻿/* ================================
+   CONTENEDOR PRINCIPAL
+================================== */
+
+.tienda-container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 30px 20px;
 }
+
+/* ================================
+   HEADER
+================================== */
 
 .tienda-header {
     text-align: center;
@@ -11,18 +19,46 @@
 
     .tienda-header h1 {
         font-size: 2.5rem;
-        font-weight: bold;
-        color: #333;
+        font-weight: 600;
+        color: #00eaff;
         margin-bottom: 10px;
     }
 
+    .tienda-header p {
+        color: #a8ccd7;
+        font-size: 1rem;
+    }
+
+/* ================================
+   FILTROS CONTAINER
+================================== */
+
 .filtros-container {
-    background: white;
+    background: rgba(0, 0, 0, 0.70);
     padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 200, 255, 0.35);
+    box-shadow: 0 0 20px rgba(0, 200, 255, 0.45);
+    backdrop-filter: blur(6px);
     margin-bottom: 30px;
 }
+
+    .filtros-container .row {
+        display: flex;
+        gap: 20px !important;
+    }
+
+    .filtros-container .col-md-5,
+    .filtros-container .col-md-4,
+    .filtros-container .col-md-3 {
+        flex: 1;
+        margin-bottom: 0 !important;
+        min-width: 0;
+    }
+
+/* ================================
+   SEARCH BOX
+================================== */
 
 .search-box {
     position: relative;
@@ -33,19 +69,62 @@
         left: 15px;
         top: 50%;
         transform: translateY(-50%);
-        color: #999;
+        color: #8cccd9;
     }
 
     .search-box input {
         padding-left: 45px;
-        border-radius: 10px;
-        border: 2px solid #e0e0e0;
+        background: rgba(12, 12, 12, 0.75);
+        border: 1px solid rgba(0, 200, 255, 0.35);
+        color: #eaffff;
+        border-radius: 8px;
+        padding: 10px 12px;
+        height: 42px;
+        font-size: 15px;
+        transition: 0.25s;
     }
 
         .search-box input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            background: rgba(20, 20, 20, 0.92);
+            border-color: #00eaff;
+            box-shadow: 0 0 10px rgba(0, 233, 255, 0.45);
+            outline: none;
         }
+
+        .search-box input::placeholder {
+            color: #8cccd9;
+        }
+
+/* ================================
+   SELECT/FORM-SELECT
+================================== */
+
+.form-select {
+    background: rgba(12, 12, 12, 0.75);
+    border: 1px solid rgba(0, 200, 255, 0.35);
+    color: #eaffff;
+    border-radius: 8px;
+    padding: 10px 12px;
+    height: 42px;
+    font-size: 15px;
+    transition: 0.25s;
+}
+
+    .form-select:focus {
+        background: rgba(20, 20, 20, 0.92);
+        border-color: #00eaff;
+        box-shadow: 0 0 10px rgba(0, 233, 255, 0.45);
+        outline: none;
+    }
+
+    .form-select option {
+        background: #0a1428;
+        color: #eaffff;
+    }
+
+/* ================================
+   GRID DE JUEGOS
+================================== */
 
 .juegos-grid {
     display: grid;
@@ -53,44 +132,70 @@
     gap: 25px;
 }
 
+/* ================================
+   TARJETA DE JUEGO
+================================== */
+
 .game-card {
-    background: white;
-    border-radius: 15px;
+    background: rgba(0, 0, 0, 0.70);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0, 200, 255, 0.35);
+    box-shadow: 0 0 20px rgba(0, 200, 255, 0.45);
+    backdrop-filter: blur(6px);
+    transition: all 0.3s ease;
 }
 
     .game-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border-color: rgba(0, 200, 255, 0.6);
+        box-shadow: 0 0 40px rgba(0, 200, 255, 0.6);
     }
+
+/* ================================
+   IMAGEN DE JUEGO
+================================== */
 
 .game-image {
     position: relative;
     width: 100%;
     height: 180px;
     overflow: hidden;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a3a52 0%, #0d2b4d 100%);
 }
 
     .game-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: transform 0.3s ease;
     }
+
+.game-card:hover .game-image img {
+    transform: scale(1.05);
+}
+
+/* ================================
+   RATING BADGE
+================================== */
 
 .rating-badge {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    color: #ffd700;
+    background: rgba(0, 200, 255, 0.3);
+    color: #00eaff;
+    border: 1px solid rgba(0, 200, 255, 0.5);
     padding: 5px 12px;
     border-radius: 20px;
     font-size: 0.9rem;
-    font-weight: bold;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
 }
+
+/* ================================
+   CONTENIDO DEL JUEGO
+================================== */
 
 .game-content {
     padding: 20px;
@@ -100,7 +205,7 @@
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 5px;
-    color: #333;
+    color: #00eaff;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -109,19 +214,35 @@
 .game-version {
     font-size: 0.85rem;
     margin-bottom: 15px;
+    color: #a8ccd7;
 }
+
+/* ================================
+   PIE DE LA TARJETA
+================================== */
 
 .game-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
 }
 
 .game-price {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #667eea;
+    color: #00eaff;
 }
+
+.btn-sm {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    border-radius: 8px !important;
+}
+
+/* ================================
+   RESPONSIVE
+================================== */
 
 @media (max-width: 768px) {
     .juegos-grid {
@@ -130,5 +251,28 @@
 
     .tienda-header h1 {
         font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .tienda-container {
+        padding: 15px 10px;
+    }
+
+    .filtros-container {
+        padding: 15px;
+    }
+
+    .juegos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    .tienda-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .game-image {
+        height: 120px;
     }
 }
