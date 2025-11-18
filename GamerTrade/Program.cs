@@ -1,13 +1,14 @@
 ﻿
 
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Blazored.LocalStorage;
 using GamerTrade;
 using GamerTrade.Services;
-using GamerTrade.Services.Interfaces;
 using GamerTrade.Services.Implementaciones;
+using GamerTrade.Services.Interfaces;
+using GamerTrade.State;
 using Microsoft.AspNetCore.Components.Authorization;
-using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -43,7 +44,9 @@ builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
 builder.Services.AddAuthorizationCore();
 
 
-//  Servicios de la Aplicación
+builder.Services.AddSingleton<AppState>();
+builder.Services.AddTransient<OrdenadorDeJuegos>();
+
 
 
 
@@ -52,6 +55,7 @@ builder.Services.AddScoped<IApiService, ApiService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJuegoService, JuegoService>();
 builder.Services.AddScoped<ICarritoService, CarritoService>();
+
 
 
 

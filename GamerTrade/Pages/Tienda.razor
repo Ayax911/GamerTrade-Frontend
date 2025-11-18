@@ -2,6 +2,8 @@
 @using GamerTrade.Models.DTO
 @inject GamerTrade.Services.Interfaces.IJuegoService JuegoService
 @inject NavigationManager Navigation
+@inject GamerTrade.Services.OrdenadorDeJuegos Ordenador
+
 
 <div class="tienda-container">
     <!-- Header de la tienda -->
@@ -228,6 +230,27 @@
     private void IrCarrito()
     {
         Navigation.NavigateTo("/carrito");
+    }
+
+    private async Task OrdenarJuegosStrategy(ChangeEventArgs e)
+    {
+        var ordenamiento = e.Value?.ToString();
+
+        // Seleccionar la estrategia adecuada
+        Ordenador.Strategy = ordenamiento switch
+        {
+            "nombre-asc" => new GamerTrade.Services.Implementaciones.OrdenarPorNombreAsc(),
+            "nombre-desc" => new GamerTrade.Services.Implementaciones.OrdenarPorNombreDesc(),
+            "precio-asc" => new GamerTrade.Services.Implementaciones.OrdenarPorPrecioAsc(),
+            "precio-desc" => new GamerTrade.Services.Implementaciones.OrdenarPorPrecioDesc(),
+            
+            _ => null
+        };
+
+        
+        juegosFiltrados = Ordenador.Ejecutar(juegosFiltrados).ToList();
+
+        await Task.CompletedTask;
     }
 
 }

@@ -1,4 +1,17 @@
 ﻿@inherits LayoutComponentBase
+@inject GamerTrade.State.AppState AppState
+
+@if (AppState.IsAuthenticated)
+{
+    <a href="/carrito" class="nav-link">Mi Carrito</a>
+    <a href="/perfil" class="nav-link">Mi Perfil</a>
+}
+else
+{
+    <a href="/login" class="nav-link">Iniciar Sesión</a>
+}
+
+
 <div class="page">
     <main>
         <article class="content px-4">
@@ -6,3 +19,15 @@
         </article>
     </main>
 </div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= StateHasChanged;
+    }
+}
