@@ -2,6 +2,12 @@
    CONTENEDOR PRINCIPAL
 ================================== */
 
+
+.tienda-page {
+    background: #000000;
+    min-height: 100vh;
+}
+
 .tienda-container {
     max-width: 1400px;
     margin: 0 auto;

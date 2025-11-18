@@ -136,14 +136,15 @@
                 Correo = RegisterDTO.Correo,
                 Contraseña = RegisterDTO.Password,
                 RolID = 1, // Jugador
-                Saldo = 0
+                Saldo = 0,
+                
             };
 
             var success = await AuthService.RegistrarAsync(usuarioDTO);
 
             if (success)
             {
-                Console.WriteLine($" Usuario registrado exitosamente");
+                //Console.WriteLine($" Usuario registrado exitosamente");
                 successMessage = "¡Cuenta creada exitosamente! Redirigiendo al login...";
 
                 await Task.Delay(2000); // Esperar 2 segundos
@@ -151,7 +152,7 @@
             }
             else
             {
-                Console.WriteLine($" Error al registrar usuario");
+                
                 errorMessage = "No se pudo crear la cuenta. El correo ya existe o hay un error en el servidor.";
             }
         }

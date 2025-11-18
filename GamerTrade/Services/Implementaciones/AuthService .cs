@@ -110,15 +110,14 @@ namespace GamerTrade.Services
             try
             {
                 var datos = new Dictionary<string, object?>
-                {
-                    { "Apodo", request.Apodo },
-                    { "Correo", request.Correo },
-                    { "Contraseña", request.Contraseña },
-                    { "RolID", request.RolID },
-                    { "Saldo", request.Saldo }
-                };
+        {
+            { "Apodo", request.Apodo },
+            { "Correo", request.Correo },
+            { "Contraseña", request.Contraseña },
+            { "RolID", request.RolID }, // Cambio: Rol es NVARCHAR, no RolID
+            { "Saldo", request.Saldo }
+        };
 
-                // Usa ApiService para crear el usuario
                 return await _apiService.CrearAsync("Usuario", datos, camposEncriptar: "Contraseña");
             }
             catch (Exception ex)

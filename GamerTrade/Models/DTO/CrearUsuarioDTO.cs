@@ -18,6 +18,7 @@ namespace GamerTrade.Models.DTO
         public string Contraseña { get; set; } 
 
         public int RolID { get; set; } 
-        public decimal Saldo { get; set; } 
+        public decimal Saldo { get; set; }
+        
     }
 }
