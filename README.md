@@ -21,7 +21,9 @@ Imágenes de evidencia UI en funcionamiento:
 
 - Juego
 ![image alt](https://github.com/Ayax911/GamerTrade-Frontend/blob/master/juego2.png)
-![image alt](https://github.com/Ayax911/GamerTrade-Frontend/blob/master/juego.png)
+
+Seccion inferior del juego donde se muestra la reseña:
+![image alt](https://github.com/Ayax911/GamerTrade-Frontend/blob/master/juego3.png)
 
 
 Interfaz del carrito:
